@@ -3,7 +3,6 @@ import './char.css';
 
 export default class Char extends Component {
   constructor(props) {
-    console.info(props);
     super(props);
 
     //global
@@ -21,7 +20,8 @@ export default class Char extends Component {
       ArrowLeft : this.PIXEL_SIZE * -4
     }
     this.MOVING_TIMEOUT = undefined;
-    this.MODEL_Y_POSITION= this.PIXEL_SIZE * this.props.model * -5;
+    //this is how the vertical pos is picked for the sprite sheet on which char model is desired.
+    this.MODEL_Y_POSITION = this.PIXEL_SIZE * this.props.model * -5;
 
     //state
     this.state = {
@@ -38,22 +38,21 @@ export default class Char extends Component {
     document.addEventListener("keyup", this.handleKeyUp, false);
   }
 
-
-  componentDidUpdate() {
-    //console.info('component did update');
-  }
-
   handleKeyDown = (event) => {
+    //if there's an ongoing moving animation, ignore.
     if(this.MOVING_TIMEOUT){
       return;
     }
-    let position = this.state.position;
+
     if(this.MOVING_POSITION[event.key] !== undefined) {
+      let position = this.state.position;
       //initiate moving animation
       const that = this;
       let counter = 0;
+
       function move() {
         position.y = that.MODEL_Y_POSITION + that.MOVING_POSITION[event.key];
+        //assuming the sprite sheet has 8 animations for directional moving ...
         if(counter >= 8){
           counter = 0;
         }
@@ -63,6 +62,7 @@ export default class Char extends Component {
         });
         counter++;
       }
+
       move();
       this.MOVING_TIMEOUT = setInterval(function() {
         move();
@@ -72,13 +72,13 @@ export default class Char extends Component {
   }
 
   handleKeyUp = (event) => {
-    //clear moving timeout
-    console.info('clearing timeout');
     clearTimeout(this.MOVING_TIMEOUT);
+    //clearing timeout doesn't set this to undefined, so we are going to force it.
     this.MOVING_TIMEOUT = undefined;
-    let position = this.state.position;
+
     if(this.DIR_POSITION[event.key] !== undefined) {
       //change direction
+      let position = this.state.position;
       position.x = this.DIR_POSITION[event.key];
       position.y = this.MODEL_Y_POSITION;
       this.setState({
