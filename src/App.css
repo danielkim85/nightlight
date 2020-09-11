@@ -38,7 +38,14 @@ Char {
 	margin: 0;
 }
 
-
+.key-help {
+	color: white;
+	font-size: 12px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	margin: 5px;
+}
 
 @keyframes App-logo-spin {
   from {
