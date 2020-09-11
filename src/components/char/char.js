@@ -7,6 +7,16 @@ export default class Char extends Component {
 
     //global
     this.PIXEL_SIZE = 32;
+    this.KEY_MAP = {
+      ArrowDown : 'ArrowDown',
+      ArrowUp : 'ArrowUp',
+      ArrowRight : 'ArrowRight',
+      ArrowLeft : 'ArrowLeft',
+      w:'ArrowUp',
+      a:'ArrowLeft',
+      s:'ArrowDown',
+      d:'ArrowRight'
+    }
     this.DIR_POSITION = {
       ArrowDown : 0,
       ArrowUp : this.PIXEL_SIZE * -1,
@@ -44,14 +54,15 @@ export default class Char extends Component {
       return;
     }
 
-    if(this.MOVING_POSITION[event.key] !== undefined) {
+    const key = this.KEY_MAP[event.key]
+    if(this.MOVING_POSITION[key] !== undefined) {
       let position = this.state.position;
       //initiate moving animation
       const that = this;
       let counter = 0;
 
       function move() {
-        position.y = that.MODEL_Y_POSITION + that.MOVING_POSITION[event.key];
+        position.y = that.MODEL_Y_POSITION + that.MOVING_POSITION[key];
         //assuming the sprite sheet has 8 animations for directional moving ...
         if(counter >= 8){
           counter = 0;
@@ -76,10 +87,11 @@ export default class Char extends Component {
     //clearing timeout doesn't set this to undefined, so we are going to force it.
     this.MOVING_TIMEOUT = undefined;
 
-    if(this.DIR_POSITION[event.key] !== undefined) {
+    const key = this.KEY_MAP[event.key]
+    if(this.DIR_POSITION[key] !== undefined) {
       //change direction
       let position = this.state.position;
-      position.x = this.DIR_POSITION[event.key];
+      position.x = this.DIR_POSITION[key];
       position.y = this.MODEL_Y_POSITION;
       this.setState({
         position : position
@@ -98,7 +110,8 @@ export default class Char extends Component {
              zoom : this.props.scale,
              backgroundPositionX : this.state.position.x + 'px',
              backgroundPositionY : this.state.position.y + 'px',
-           }} />
+           }}
+      />
     );
   }
 }

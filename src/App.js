@@ -48,8 +48,8 @@ class App extends React.Component {
     return (
       <div className="App">
         {/*<div id="player"></div>*/}
-        <Char scale="2"
-              model="1"
+        <Char scale="3"
+              model="15"
               tilemap="/assets/char_tilemap.png">foo</Char>
       </div>
     );
