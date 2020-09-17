@@ -8,6 +8,8 @@ export default class Char extends Component {
     //global
     this.PIXEL_SIZE = 32;
     this.MOVING_SPEED = 2.5;
+
+    //multiple key support for directions
     this.KEY_MAP = {
       ArrowDown : 'ArrowDown',
       ArrowUp : 'ArrowUp',
@@ -19,37 +21,40 @@ export default class Char extends Component {
       d:'ArrowRight'
     }
 
-    // TODO : Merge the below three global obj
-    this.DIR_POSITION = {
-      ArrowDown : 0,
-      ArrowUp : this.PIXEL_SIZE * -1,
-      ArrowRight : this.PIXEL_SIZE * -2,
-      ArrowLeft : this.PIXEL_SIZE * -3
-    }
-    this.MOVING_POSITION = {
-      ArrowRight : this.PIXEL_SIZE * -1,
-      ArrowUp : this.PIXEL_SIZE * -2,
-      ArrowDown : this.PIXEL_SIZE * -3,
-      ArrowLeft : this.PIXEL_SIZE * -4
-    }
-    this.MOVING_OFFSET= {
-      ArrowRight : {
-        dir : 'left',
-        offset : 1
-      },
-      ArrowLeft : {
-        dir : 'left',
-        offset : -1
-      },
+    this.KEY_MAP_SIMPLE = {
       ArrowDown : {
-        dir : 'top',
-        offset : 1
+        DIR_POSITION : 0,
+        MOVING_POSITION : this.PIXEL_SIZE * -3,
+        MOVING_OFFSET : {
+          dir : 'top',
+          offset : 1
+        }
       },
       ArrowUp : {
-        dir : 'top',
-        offset : -1
+        DIR_POSITION : this.PIXEL_SIZE * -1,
+        MOVING_POSITION : this.PIXEL_SIZE * -2,
+        MOVING_OFFSET : {
+          dir : 'top',
+          offset : -1
+        }
+      },
+      ArrowRight : {
+        DIR_POSITION : this.PIXEL_SIZE * -2,
+        MOVING_POSITION : this.PIXEL_SIZE * -1,
+        MOVING_OFFSET : {
+          dir : 'left',
+          offset : 1
+        },
+      },
+      ArrowLeft : {
+        DIR_POSITION : this.PIXEL_SIZE * -3,
+        MOVING_POSITION : this.PIXEL_SIZE * -4,
+        MOVING_OFFSET : {
+          dir : 'left',
+          offset : -1
+        },
       }
-    }
+    };
 
     this.MOVING_TIMEOUT = undefined;
     //this is how the vertical pos is picked for the sprite sheet on which char model is desired.
@@ -73,26 +78,26 @@ export default class Char extends Component {
   }
 
   handleKeyDown = (event) => {
-    //if there's an ongoing moving animation, ignore.
-    if(this.MOVING_TIMEOUT){
+    //if there's an ongoing moving animation OR key unknown, ignore
+    const key = this.KEY_MAP[event.key]
+    if(this.MOVING_TIMEOUT || !this.KEY_MAP_SIMPLE[key]){
       return;
     }
 
-    const key = this.KEY_MAP[event.key]
-    if(this.MOVING_POSITION[key] !== undefined) {
+    if(this.KEY_MAP_SIMPLE[key].MOVING_POSITION !== undefined) {
       let position = this.state.position;
       //initiate moving animation
       const that = this;
       let counter = 0;
 
       function move() {
-        position.y = that.MODEL_Y_POSITION + that.MOVING_POSITION[key];
+        position.y = that.MODEL_Y_POSITION + that.KEY_MAP_SIMPLE[key].MOVING_POSITION;
         //assuming the sprite sheet has 8 animations for directional moving ...
         if(counter >= 8){
           counter = 0;
         }
         position.x = that.PIXEL_SIZE * counter * -1;
-        position[that.MOVING_OFFSET[key].dir] = position[that.MOVING_OFFSET[key].dir] + (that.MOVING_OFFSET[key].offset * that.MOVING_SPEED);
+        position[that.KEY_MAP_SIMPLE[key].MOVING_OFFSET.dir] += (that.KEY_MAP_SIMPLE[key].MOVING_OFFSET.offset * that.MOVING_SPEED);
         that.setState({
           position: position
         });
@@ -113,10 +118,15 @@ export default class Char extends Component {
     this.MOVING_TIMEOUT = undefined;
 
     const key = this.KEY_MAP[event.key]
-    if(this.DIR_POSITION[key] !== undefined) {
+    //if key unknown, quit
+    if(!this.KEY_MAP_SIMPLE[key]){
+      return;
+    }
+
+    if(this.KEY_MAP_SIMPLE[key].DIR_POSITION !== undefined) {
       //change direction
       let position = this.state.position;
-      position.x = this.DIR_POSITION[key];
+      position.x = this.KEY_MAP_SIMPLE[key].DIR_POSITION;
       position.y = this.MODEL_Y_POSITION;
       this.setState({
         position : position
