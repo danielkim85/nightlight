@@ -7,6 +7,7 @@ export default class Char extends Component {
 
     //global
     this.PIXEL_SIZE = 32;
+    this.MOVING_SPEED = 2.5;
     this.KEY_MAP = {
       ArrowDown : 'ArrowDown',
       ArrowUp : 'ArrowUp',
@@ -17,6 +18,8 @@ export default class Char extends Component {
       s:'ArrowDown',
       d:'ArrowRight'
     }
+
+    // TODO : Merge the below three global obj
     this.DIR_POSITION = {
       ArrowDown : 0,
       ArrowUp : this.PIXEL_SIZE * -1,
@@ -29,6 +32,25 @@ export default class Char extends Component {
       ArrowDown : this.PIXEL_SIZE * -3,
       ArrowLeft : this.PIXEL_SIZE * -4
     }
+    this.MOVING_OFFSET= {
+      ArrowRight : {
+        dir : 'left',
+        offset : 1
+      },
+      ArrowLeft : {
+        dir : 'left',
+        offset : -1
+      },
+      ArrowDown : {
+        dir : 'top',
+        offset : 1
+      },
+      ArrowUp : {
+        dir : 'top',
+        offset : -1
+      }
+    }
+
     this.MOVING_TIMEOUT = undefined;
     //this is how the vertical pos is picked for the sprite sheet on which char model is desired.
     this.MODEL_Y_POSITION = this.PIXEL_SIZE * this.props.model * -5;
@@ -37,8 +59,10 @@ export default class Char extends Component {
     this.state = {
       tilemap : this.props.tilemap,
       position : {
-        x:0,
-        y:this.MODEL_Y_POSITION
+        x : 0,
+        y : this.MODEL_Y_POSITION,
+        left : 0,
+        top : 0
       }
     }
   }
@@ -68,6 +92,7 @@ export default class Char extends Component {
           counter = 0;
         }
         position.x = that.PIXEL_SIZE * counter * -1;
+        position[that.MOVING_OFFSET[key].dir] = position[that.MOVING_OFFSET[key].dir] + (that.MOVING_OFFSET[key].offset * that.MOVING_SPEED);
         that.setState({
           position: position
         });
@@ -110,6 +135,9 @@ export default class Char extends Component {
              zoom : this.props.scale,
              backgroundPositionX : this.state.position.x + 'px',
              backgroundPositionY : this.state.position.y + 'px',
+             position : 'relative',
+             left : this.state.position.left + 'px',
+             top : this.state.position.top + 'px'
            }}
       />
     );
