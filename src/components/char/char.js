@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import './char.css';
 
 export default class Char extends Component {
   constructor(props) {
     super(props);
-
+    console.info(props);
     //global
     this.PIXEL_SIZE = 32;
     this.MOVING_SPEED = 2.5;
@@ -66,8 +67,8 @@ export default class Char extends Component {
       position : {
         x : 0,
         y : this.MODEL_Y_POSITION,
-        left : 0,
-        top : 0
+        left : undefined,
+        top : undefined
       }
     }
   }
@@ -75,6 +76,21 @@ export default class Char extends Component {
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown, false);
     document.addEventListener("keyup", this.handleKeyUp, false);
+    console.info('component did mount (char)');
+    const coord = this.props.getCoord('board_0_0'); 
+    console.info(coord);
+    let position = this.state.position;
+    if(!this.state.position.left){
+      position.left = coord.left;
+      position.top = coord.top;
+      this.setState({
+        position:position
+      });
+    }
+  }
+
+  componentWillMount(){
+
   }
 
   handleKeyDown = (event) => {
@@ -145,7 +161,7 @@ export default class Char extends Component {
              zoom : this.props.scale,
              backgroundPositionX : this.state.position.x + 'px',
              backgroundPositionY : this.state.position.y + 'px',
-             position : 'relative',
+             position : 'absolute',
              left : this.state.position.left + 'px',
              top : this.state.position.top + 'px'
            }}

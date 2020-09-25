@@ -4,6 +4,7 @@ import './App.css';
 
 import YouTube from './components/youtube/api.js'
 import Char from './components/char/char.js'
+import Board from './components/board/board.js'
 
 class App extends React.Component {
 
@@ -51,9 +52,11 @@ class App extends React.Component {
         <div className={'key-help'}>
           ↑  ← ↓ →/ w a s d
         </div>
-        <Char scale="3"
-              model="15"
-              tilemap="/assets/char_tilemap.png">foo</Char>
+        <Board scale={3}>
+          <Char scale="3"
+                model="15"
+                tilemap="/assets/char_tilemap.png">foo</Char>
+        </Board>
       </div>
     );
   }
