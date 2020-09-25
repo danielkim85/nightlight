@@ -12,9 +12,7 @@ export default class Char extends Component {
   }
 
   getCoord = (value) => {
-    return ReactDOM
-           .findDOMNode(this.refs[value])
-           .getBoundingClientRect();;
+    return this[value + '_ref'].getBoundingClientRect();
   }
 
   createBoard = () => {
@@ -22,14 +20,15 @@ export default class Char extends Component {
     const tilesProp = {
       '1_1' : 'blocked'
     };
+    
     for(let i = 0; i < 5; i++){
-      let children = [];
+
       for (let j = 0; j < 10; j++) {
         const prop = tilesProp[j + '_' + i] ? tilesProp[j + '_' + i] : '';
         const key = 'board_' + j + '_' + i;
-        children.push(
+        tiles.push(
           <div key={key}
-               ref={key}
+               ref={ ref => { this[`${key}_ref`] = ref } }
                style={{
                  zoom : this.props.scale
                }}
@@ -38,7 +37,6 @@ export default class Char extends Component {
           }</div>
         );
       }
-      tiles.push(<tr key={'tr_' + i}>{children}</tr>)
     }
 
     return tiles;

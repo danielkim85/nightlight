@@ -1,3 +1,6 @@
+.board-parent{
+	width:960px;
+}
 .board {
 	width:32px;
 	height:32px;

@@ -77,7 +77,7 @@ export default class Char extends Component {
     document.addEventListener("keydown", this.handleKeyDown, false);
     document.addEventListener("keyup", this.handleKeyUp, false);
     console.info('component did mount (char)');
-    const coord = this.props.getCoord('board_0_0'); 
+    const coord = this.props.getCoord('board_2_3'); 
     console.info(coord);
     let position = this.state.position;
     if(!this.state.position.left){
@@ -87,10 +87,6 @@ export default class Char extends Component {
         position:position
       });
     }
-  }
-
-  componentWillMount(){
-
   }
 
   handleKeyDown = (event) => {
