@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import './char.css';
 
 export default class Char extends Component {
   constructor(props) {
     super(props);
-    console.info(props);
+
+    console.info(this.props);
     //global
     this.PIXEL_SIZE = 32;
     this.MOVING_SPEED = 2.5;
@@ -77,9 +77,12 @@ export default class Char extends Component {
     document.addEventListener("keydown", this.handleKeyDown, false);
     document.addEventListener("keyup", this.handleKeyUp, false);
     console.info('component did mount (char)');
-    const coord = this.props.getCoord('board_2_3'); 
-    console.info(coord);
+
+    //sets starting position
+    const coord = this.props.getCoord('board_0_0'); 
+
     let position = this.state.position;
+
     if(!this.state.position.left){
       position.left = coord.left;
       position.top = coord.top;
@@ -90,6 +93,7 @@ export default class Char extends Component {
   }
 
   handleKeyDown = (event) => {
+
     //if there's an ongoing moving animation OR key unknown, ignore
     const key = this.KEY_MAP[event.key]
     if(this.MOVING_TIMEOUT || !this.KEY_MAP_SIMPLE[key]){
@@ -97,22 +101,29 @@ export default class Char extends Component {
     }
 
     if(this.KEY_MAP_SIMPLE[key].MOVING_POSITION !== undefined) {
-      let position = this.state.position;
       //initiate moving animation
       const that = this;
       let counter = 0;
 
       function move() {
-        position.y = that.MODEL_Y_POSITION + that.KEY_MAP_SIMPLE[key].MOVING_POSITION;
+        const newPos = JSON.parse(JSON.stringify(that.state.position));
+        newPos.y = that.MODEL_Y_POSITION + that.KEY_MAP_SIMPLE[key].MOVING_POSITION;
         //assuming the sprite sheet has 8 animations for directional moving ...
         if(counter >= 8){
           counter = 0;
         }
-        position.x = that.PIXEL_SIZE * counter * -1;
-        position[that.KEY_MAP_SIMPLE[key].MOVING_OFFSET.dir] += (that.KEY_MAP_SIMPLE[key].MOVING_OFFSET.offset * that.MOVING_SPEED);
+        newPos.x = that.PIXEL_SIZE * counter * -1;
+        newPos[that.KEY_MAP_SIMPLE[key].MOVING_OFFSET.dir] += (that.KEY_MAP_SIMPLE[key].MOVING_OFFSET.offset * that.MOVING_SPEED);
+        if(that.props.checkCoord(newPos.left,newPos.top)) {
+          clearTimeout(that.MOVING_TIMEOUT);
+          that.MOVING_TIMEOUT = undefined;
+          return;
+        }
+
         that.setState({
-          position: position
+          position: newPos
         });
+
         counter++;
       }
 
@@ -150,6 +161,7 @@ export default class Char extends Component {
     return (
       <div className="char"
            alt="nada"
+           ref={ ref => { this[`${this.props.id}_ref`] = ref } }
            style={{
              width:this.PIXEL_SIZE + 'px',
              height:this.PIXEL_SIZE + 'px',

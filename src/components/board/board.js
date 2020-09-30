@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import './board.css';
 
 export default class Char extends Component {
@@ -8,24 +7,54 @@ export default class Char extends Component {
   }
 
   componentDidMount() {
-    console.info('component did mount (board)');
+    console.warn('component did mount (board)');
+    this.blockedX = [];
+    this.blockedY = [];
+
+    for(const key in this.tilesProp) {
+      const blockedCoord = this[key + '_ref'].getBoundingClientRect();
+      this.blockedX.push([blockedCoord.left-32, blockedCoord.left+32]);
+      this.blockedY.push([blockedCoord.top-32, blockedCoord.top+32]);
+    }
   }
 
   getCoord = (value) => {
     return this[value + '_ref'].getBoundingClientRect();
   }
 
+  //returns true if blocked
+  checkCoord = (x,y) => {
+    let isBlockedX = false;
+    let isBlockedY = false;
+
+    //check upper low boundaries
+    if( x < 0 ||
+        x > ((this.props.sizeX-1) * 32) ||
+        y > ((this.props.sizeY-1) * 32) ||
+        y < 0 ) {
+      return true;
+    }
+
+    for(const x_ of this.blockedX){
+      isBlockedX = x > x_[0] && x < x_[1];
+    }
+    for(const y_ of this.blockedY){
+      isBlockedY = y > y_[0] && y < y_[1];
+    }
+    return isBlockedX && isBlockedY;
+  }
+
   createBoard = () => {
     let tiles = [];
-    const tilesProp = {
-      '1_1' : 'blocked'
+    //same blocked positions
+    this.tilesProp = {
+      'board_1_1' : 'blocked'
     };
-    
-    for(let i = 0; i < 5; i++){
 
-      for (let j = 0; j < 10; j++) {
-        const prop = tilesProp[j + '_' + i] ? tilesProp[j + '_' + i] : '';
+    for(let i = 0; i < this.props.sizeY; i++){
+      for (let j = 0; j < this.props.sizeX; j++) {
         const key = 'board_' + j + '_' + i;
+        const prop = this.tilesProp[key] ? this.tilesProp[key] : '';
         tiles.push(
           <div key={key}
                ref={ ref => { this[`${key}_ref`] = ref } }
@@ -33,7 +62,6 @@ export default class Char extends Component {
                  zoom : this.props.scale
                }}
                className={'board ' + prop}>{
-            i + ' ' + j
           }</div>
         );
       }
@@ -44,9 +72,20 @@ export default class Char extends Component {
 
   render() {
     return (
-      <div className={'board-parent'}>
+      <div className={'board-parent'} 
+           id="boardParent"
+           style={{
+            width: 32 * this.props.sizeX * this.props.scale
+           }}>
         {this.createBoard()}
-        {React.cloneElement(this.props.children, { getCoord: this.getCoord })}
+        { React.cloneElement(
+            this.props.children, {
+              scale : this.props.scale,
+              getCoord: this.getCoord,
+              checkCoord: this.checkCoord
+            }
+          )
+        }
       </div>
     );
   }

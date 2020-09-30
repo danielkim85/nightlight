@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from './logo.svg';
+//import logo from './logo.svg';
 import './App.css';
 
 import YouTube from './components/youtube/api.js'
@@ -52,9 +52,11 @@ class App extends React.Component {
         <div className={'key-help'}>
           ↑  ← ↓ →/ w a s d
         </div>
-        <Board scale={3}>
-          <Char scale="3"
-                model="15"
+        <Board scale={3} 
+               sizeY={5} 
+               sizeX={10}>
+          <Char model="15"
+                id="mychar"
                 tilemap="/assets/char_tilemap.png">foo</Char>
         </Board>
       </div>

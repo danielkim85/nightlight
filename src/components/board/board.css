@@ -1,5 +1,5 @@
 .board-parent{
-	width:960px;
+	float:left;
 }
 .board {
 	width:32px;
